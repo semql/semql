@@ -1,0 +1,22 @@
+{
+  "name": "semql",
+  "version": "0.0.1",
+  "description": "Semantic Query Language",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/semql/semql.git"
+  },
+  "author": "David Fahlander",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/semql/semql/issues"
+  },
+  "homepage": "https://github.com/semql/semql#readme",
+  "devDependencies": {
+    "typescript": "^2.8.1"
+  }
+}
