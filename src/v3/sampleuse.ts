@@ -7,9 +7,11 @@ interface Friend {
 }
 
 var x = null as any as Collection<Friend>;
-
+//x.where(f => f.name)
+x.where(f => f.name.startsWith("apa"));
 x.where(f => f.name.startsWith("Apa")).where(f => f.name.startsWith("Ulla"));
 x.where(f => f.parent.age.above(50).and(f => f.parent.name.endsWith("Ola")));
+//x.where(f => f.age.between(1, 2).or(f => f.name.startsWith("")))
 //x.where(f => f.age.)
 // name.startsWith("A") AND age < 7.
 // name startsWith("A") OR age < 7

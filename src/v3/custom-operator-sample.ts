@@ -1,27 +1,24 @@
-import { StandardOperators, Expression, IsDataType, EntityProxy } from "./semql";
+import { StandardOperators, Expression, IsDataType, Collection } from "./semql";
 
-export interface Range<T> {
-  [IsDataType]: true;
-  from: T;
-  to: T;
+export interface DateRange {
+  [IsDataType]?: true;
+  from: Date;
+  to: Date;
 }
 
-export interface MyOperators<T, TEntity, TOperators extends StandardOperators<T, TEntity>> {
-  //[x:string]: any;
-  //EntityProxy: {[P in keyof T]: EntityProxy<T[P], MyOperators<T[P], TEntity>, TEntity>}
-  //Root: MyOperators<TEntity, TEntity>;
-  
-  /*equals(other: T): Expression<TEntity, this, any>;
-  above(other: T): Expression<TEntity, this, number & string & any[]>;
-  aboveOrEqual(other: T): Expression<TEntity, this, number & string & any[]>;
-  below(other: T): Expression<TEntity, this, number & string & any[]>;
-  belowOrEqual(other: T): Expression<TEntity, this, number & string & any[] >;
-  between(lower: T, upper: T): Expression<TEntity, this, any>;
-  anyOf(set: T[]): Expression<TEntity, this, any>;
-  startsWith(other: string): Expression<TEntity, this, string>;
-  endsWith(other: string): Expression<TEntity, this, string>;
-  contains(other: string | RegExp): Expression<TEntity, this, string>;*/
-  overlapsWith(other: Range<any>): Expression<TEntity, TOperators, Range<any>>
+export interface RangeOperators {
+  overlapsWith(lvalue: DateRange, other: DateRange): boolean;
 }
 
-//type Operators<T> = StandardOperators<T,T> & MyOperators<T, T
+interface Activity {
+  name: string;
+  age: number;
+  period: DateRange;
+}
+
+var activities = null as any as Collection<Activity, StandardOperators & RangeOperators>;
+activities.where(a => a.period.equals({from: new Date(), to: new Date()}));
+activities.where(a => a.period.overlapsWith({from: new Date(), to: new Date()}));
+//activities.where(a => a.name.between("", "").or(f => f.age.below()
+//activities.where(a => a.name)
+//activities.where(a => a.n)
