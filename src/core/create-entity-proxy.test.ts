@@ -6,21 +6,100 @@ import { dataExpression } from "../symbols";
 interface Friend {
   name: string;
   age: number;
+  tags: string[];
+  cars: Car[];
 }
 
-//test('create-entity-proxy', ()=>{
+interface Car {
+  brand: string;
+  model: string;
+}
 
-  const expression: JsExpression<Friend> = ({name, age}) =>
-    age.above(25).AND(name.startsWith("D").ignoreAccents().ignoreCase())
-    .OR(age.noneOf([1,2,3]).AND(name.notEqual("APA")))
+function verify<T> (jsExpr: JsExpression<T>, expectedResult: any[]) {
+  const data = jsExpr(createProxy<T>())[dataExpression];
+  expect(data).toEqual(expectedResult);
+}
 
-  const proxy = createProxy<Friend>();
-  const dataExpr = expression(proxy);
-  debugger;
-  const de = dataExpr[dataExpression];
-  debugger;
-  console.log(JSON.stringify(de, null, 2));
-  //const x =1, y=1;
-  //expect(x).toBe(y);
+test('create-entity-proxy', ()=>{
 
-//});
+  verify<Friend>(
+    friend => friend.age.above(25), [
+      "age",
+      "above",
+      25
+    ]);
+
+  verify<Friend> (
+
+    ({name}) =>
+      name.startsWithAnyOf(["D", "Y"]).ignoreCase(),
+
+    [
+      "name",
+      "startsWithAnyOf",
+      ["D", "Y"],
+      "ignoreCase"
+    ]
+  );
+
+  verify<Friend>(({name, cars}) =>
+    name.anyOf(["Arnold", "Hulken"]).AND(
+      cars.some(car => car.brand.equals("Volvo"))) ,
+      
+  [
+    [
+      "name",
+      "anyOf",
+      ["Arnold", "Hulken"]    
+    ],
+    "AND",
+    [
+      "cars",
+      "some",
+      [
+        "brand",
+        "equals",
+        "Volvo"
+      ]
+    ]
+  ]);
+
+  verify<Friend>(({name, tags, age, cars}) => 
+
+    tags.includes("friend").AND(
+      name.equals("Arne").ignoreCase()
+    ).AND(cars.every(({model}) => model.equals("V70").ignoreCase()))
+    .AND(age.above(1)), [[[
+    [
+      "tags",
+      "includes",
+      "friend"
+    ],
+    "AND",
+    [
+      "name",
+      "equals",
+      "Arne",
+      "ignoreCase"
+    ]
+  ],
+  "AND",
+  [
+    "cars",
+    "every",
+    [
+      "model",
+      "equals",
+      "V70",
+      "ignoreCase"
+    ]
+  ]
+],
+"AND",
+[
+  "age",
+  "above",
+  1
+]
+])
+});

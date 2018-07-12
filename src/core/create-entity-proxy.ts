@@ -27,7 +27,10 @@ export function createProxy<TEntity=any> (propertyPath?: PropertyKey[], expr?: a
         createProxy([], [
           propPath.slice(0, pMethod).join('.'),
           method,
-          args.length > 2 ? args : args[0]
+          args.length > 2 ? args :
+            typeof args[0] === 'function' ?
+              args[0](createProxy())[dataExpression] :
+              args[0]
         ], ProxyType.Expression) :
         method === "AND" || method === "OR" ?
           createProxy([], [expr, method, args[0][dataExpression]], ProxyType.Expression) :
