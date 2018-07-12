@@ -1,6 +1,6 @@
 import { EntityProxy } from "./entity-proxy";
 import { Expression } from "./expression";
-import { dataExpression } from "../symbols";
+import { Introspect } from "../symbols";
 
 const FUNC = function(){};
 
@@ -9,12 +9,16 @@ export const enum ProxyType {
   Expression
 }
 
-export function createProxy<TEntity=any> (propertyPath?: PropertyKey[], expr?: any[], type: ProxyType=ProxyType.Entity): EntityProxy<TEntity> {
+export function createProxy<TEntity=any> (
+  propertyPath?: PropertyKey[],
+  expr?: any[],
+  type: ProxyType=ProxyType.Entity): EntityProxy<TEntity>
+{
   const propPath = propertyPath || [];
   return new Proxy(FUNC, {
     get (obj, prop) {
-      return prop === dataExpression ?
-        expr :
+      return prop === Introspect ?
+        {expr, propPath, type} :
         createProxy(propPath ? [...propPath, prop] : [prop], expr, type);
     },
     set (obj, prop, value) {
@@ -29,11 +33,11 @@ export function createProxy<TEntity=any> (propertyPath?: PropertyKey[], expr?: a
           method,
           args.length > 2 ? args :
             typeof args[0] === 'function' ?
-              args[0](createProxy())[dataExpression] :
+              args[0](createProxy())[Introspect].expr :
               args[0]
         ], ProxyType.Expression) :
         method === "AND" || method === "OR" ?
-          createProxy([], [expr, method, args[0][dataExpression]], ProxyType.Expression) :
+          createProxy([], [expr, method, args[0][Introspect].expr], ProxyType.Expression) :
           createProxy([], [
             ...expr!,
             args.length > 0 ?

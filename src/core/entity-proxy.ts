@@ -1,5 +1,5 @@
 import { CustomOperators } from "../operators/custom-operators";
-import { SemqlOperators } from "../symbols";
+import { SemqlOperators, CollectionOf, ReferenceTo } from "../symbols";
 import { StringOperators } from "../operators/string-operators";
 import { StandardOperators } from "../operators/standard-operators";
 import { BooleanOperators } from "../operators/boolean-operators";
@@ -14,6 +14,8 @@ export type EntityProxy<T, TEntity=T> =
   T extends number ? StandardOperators<T, TEntity> :
   T extends boolean ? BooleanOperators<TEntity> :
   T extends Date ? DateOperators<TEntity> :
+  T extends {[CollectionOf]?: infer U} ? CollectionOperators<U, TEntity> :
+  //T extends {[ReferenceTo]?: infer U} ? {[P in keyof U]: EntityProxy<U[P], TEntity>} :
   T extends ArrayBufferLike ? SequenceOperators<T, TEntity> :
   T extends ArrayBufferView ? SequenceOperators<T, TEntity> :
   T extends ReadonlyArray<PrimitiveType> ? SequenceOperators<T, TEntity> & SetOperators<T[number], TEntity> :
