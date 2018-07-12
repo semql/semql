@@ -1,18 +1,18 @@
-import { DataExpression, ExpressionWithOptions } from "../core/data-expression";
+import { Expression, ExpressionWithOptions } from "../core/expression";
 import { StringOperatorOptions } from "./string-operators";
 import { JsExpression } from "../core/js-expression";
 
 export interface SetOperators<TItem, TEntity> {
   includes(value: TItem): TItem extends string ?
     ExpressionWithOptions<TEntity, StringOperatorOptions> :
-    DataExpression<TEntity>;
+    Expression<TEntity>;
   includesAnyOf(values: TItem[]): TItem extends string ?
     ExpressionWithOptions<TEntity, StringOperatorOptions> :
-    DataExpression<TEntity>;
+    Expression<TEntity>;
   includesAll(values: TItem[]): TItem extends string ?
     ExpressionWithOptions<TEntity, StringOperatorOptions> :
-    DataExpression<TEntity>;
+    Expression<TEntity>;
 
-  some(expr: JsExpression<TItem>): DataExpression<TEntity>;
-  every(expr: JsExpression<TItem>): DataExpression<TEntity>;
+  some(expr: JsExpression<TItem>): Expression<TEntity>;
+  every(expr: JsExpression<TItem>): Expression<TEntity>;
 }

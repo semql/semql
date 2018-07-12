@@ -31,12 +31,25 @@ const friends = await db.friends.where({
 ```js
 db.docs.query({
   expr: [
+    ["customer", "equals", "Scania", ["ignoreCase"]],
+    "AND",
+    [
+      ["age", ["NOT", "above"], [30]],
+      "AND"
+
+    ]
+      ["name", "startsWith", ["D"]],
+      "AND",
+      []
+    ]
+  ],
+  expr: [
     "AND", [
-      ["EQUALS", "customer", "Scania", ["ignoreCase"]],
-      ["NOT", ["ABOVE", "age", 30]],
-      ["STARTSWITH", "name", "D"],
+      ["EQUALS", "customer", ["Scania"], ["ignoreCase"]],
+      ["NOT", ["ABOVE", "age", [30]]],
+      ["STARTSWITH", "name", ["D"]],
       ["SOME", "cars", [
-        "EQUALS", "brand", "Volvo"
+        "EQUALS", "brand", ["Volvo"]
       ]]
     ]
   ],

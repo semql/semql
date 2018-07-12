@@ -1,16 +1,16 @@
-import { DataExpression, ExpressionWithOptions } from "../core/data-expression";
+import { Expression, ExpressionWithOptions } from "../core/expression";
 import { ReplaceReturnType } from "../utils/replace-return-type";
 
 export interface StandardOperators<T, TEntity> {
-  equals(value: T): DataExpression<TEntity>;
-  above(value: T): DataExpression<TEntity>;
-  aboveOrEqual(value: T): DataExpression<TEntity>;
-  below(value: T): DataExpression<TEntity>;
-  belowOrEqual(value: T): DataExpression<TEntity>;
+  equals(value: T): Expression<TEntity>;
+  above(value: T): Expression<TEntity>;
+  aboveOrEqual(value: T): Expression<TEntity>;
+  below(value: T): Expression<TEntity>;
+  belowOrEqual(value: T): Expression<TEntity>;
   between(from: T, to: T): ExpressionWithOptions<TEntity, BetweenOperatorOptions>;
-  anyOf(values: T[]): DataExpression<TEntity>;
-  noneOf(values: T[]): DataExpression<TEntity>;
-  notEqual(value: T): DataExpression<TEntity>;
+  anyOf(values: T[]): Expression<TEntity>;
+  noneOf(values: T[]): Expression<TEntity>;
+  notEqual(value: T): Expression<TEntity>;
 }
 
 export interface BetweenOperatorOptions {

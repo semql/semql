@@ -1,4 +1,4 @@
-import { DataExpression, ExpressionWithOptions } from "../core/data-expression";
+import { Expression, ExpressionWithOptions } from "../core/expression";
 import { BetweenOperatorOptions } from "./standard-operators";
 
 export interface StringOperators<TEntity> {
