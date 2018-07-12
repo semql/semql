@@ -53,5 +53,5 @@ function semql<TTypeMapper extends (t: any)=>any>(typeMapper: TTypeMapper) {
 
 // Addon does:
 const createCollection = semql(myTypeMapper);
-createCollection.createCollection().where(3).
+//createCollection.createCollection().where(3).
 

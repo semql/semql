@@ -70,7 +70,18 @@ db.friends.where({
 }).toArray();
 ```
 
-### SemQL:
+## SemQL (new)
+```ts
+db.friends.where(({name, age, lastName}) => and ([
+  or ([
+    name.equals("David"),
+    age.above(25)
+  ]),
+  lastName.equals("Fahlander")
+]))
+```
+
+### SemQL (old):
 ```ts
 db.friends.where({
   or({

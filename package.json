@@ -4,7 +4,8 @@
   "description": "Semantic Query Language",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "build": "tsc --p src",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,13 @@
   },
   "homepage": "https://github.com/semql/semql#readme",
   "devDependencies": {
-    "typescript": "^2.8.1"
+    "@types/jest": "^23.1.5",
+    "@types/react": "^16.4.0",
+    "jest": "^23.4.0",
+    "react": "^16.4.1",
+    "ts-jest": "^23.0.0",
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
   }
 }
