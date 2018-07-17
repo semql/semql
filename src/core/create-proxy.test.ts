@@ -1,9 +1,9 @@
 import { EntityProxy } from "./entity-proxy";
-import { createProxy } from "./create-entity-proxy";
+import { createProxy } from "./create-proxy";
 import { JsExpression } from "./js-expression";
 import { Introspect } from "../symbols";
 import { NOT } from "./not";
-import { Expression, ExportableExpression } from "./expression";
+import { ExpressionProxy, ExportableExpressionProxy } from "./expression-proxy";
 
 interface Friend {
   name: string;
@@ -18,7 +18,7 @@ interface Car {
 }
 
 function verify<T>(jsExpr: JsExpression<T>, expectedResult: any[]) {
-  const {expr, propPath, type} = (jsExpr(createProxy<T>()) as ExportableExpression)[Introspect];
+  const {expr, propPath, type} = (jsExpr(createProxy<T>()) as ExportableExpressionProxy)[Introspect];
   expect(expr).toEqual(expectedResult);
 }
 
@@ -106,7 +106,7 @@ test('create-entity-proxy', () => {
     ]);
   verify<Friend>(f => NOT(f.name.anyOf(["Foo", "Bar"])),[
     "name",
-    ["NOT", "anyOf"],
+    "NOT anyOf",
     ["Foo", "Bar"]
   ]);
 
@@ -115,7 +115,7 @@ test('create-entity-proxy', () => {
     "above",
     3
   ],
-  ["NOT", "AND"],
+  "NOT AND",
   [
     "age",
     "belowOrEqual",
@@ -125,8 +125,8 @@ test('create-entity-proxy', () => {
 
 
   const prefixes = ["Foo", "Bar", "Apa"];
-  verify<Friend>(({name}) =>
-    prefixes.map(prefix => name.startsWith(prefix) as Expression<Friend>).reduce((res, expr) => res.AND(expr)),[
+  verify<Friend>(({name, age}) =>
+    prefixes.map(prefix => name.startsWith(prefix)).reduce((res, expr) => res.AND(expr)).ignoreCase(),[
       [
       ["name", "startsWith", "Foo"],
       "AND",
@@ -135,5 +135,6 @@ test('create-entity-proxy', () => {
     "AND",
     [
       "name", "startsWith", "Apa"
-    ]]);
+    ],
+    "ignoreCase"]);
 });

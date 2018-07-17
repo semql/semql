@@ -1,6 +1,6 @@
-import { Expression } from "./expression";
+import { ExpressionProxy } from "./expression-proxy";
 import { EntityProxy } from "./entity-proxy";
 
 export type JsExpression<TEntity> =
-  (entry: EntityProxy<TEntity>) => Expression<TEntity>;
+  (entry: EntityProxy<TEntity>) => ExpressionProxy<TEntity>;
   

@@ -1,5 +1,5 @@
 import { EntityProxy } from "./entity-proxy";
-import { Expression } from "./expression";
+import { ExpressionProxy } from "./expression-proxy";
 import { Introspect } from "../symbols";
 
 const FUNC = function(){};

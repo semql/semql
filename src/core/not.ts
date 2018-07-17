@@ -1,12 +1,20 @@
-import { Expression, ExportableExpression } from "./expression";
+import { ExpressionProxy, ExportableExpressionProxy } from "./expression-proxy";
 import { Introspect } from "../symbols";
-import { createProxy, ProxyType } from "./create-entity-proxy";
+import { createProxy, ProxyType } from "./create-proxy";
 
-export function NOT<TEntity> (expression: Expression<TEntity>): Expression<TEntity> {
-  const expr = (expression as ExportableExpression)[Introspect].expr;
+export function NOT<TEntity> (expression: ExpressionProxy<TEntity>): ExpressionProxy<TEntity> {
+  const expr = (expression as ExportableExpressionProxy)[Introspect].expr;
   if (!expr) throw new Error("Invalid expression");
+  const [lvalue, operator, rvalue, ...options] = expr;
   return createProxy<TEntity>(
     [],
-    [expr[0], ["NOT", expr[1]], ...expr.slice(2)],
-    ProxyType.Expression) as any as Expression<TEntity>;
+    [
+      lvalue,
+      (operator.startsWith("NOT ") ?
+        operator.substr(4) : // Remove "NOT " from operator
+        "NOT " + operator), // Add "NOT " before operator
+      rvalue,
+      ...options
+    ],
+    ProxyType.Expression) as any as ExpressionProxy<TEntity>;
 }

@@ -1,7 +1,7 @@
-import { Expression, ExpressionWithOptions } from "../core/expression";
+import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/expression-proxy";
 
 export interface BooleanOperators<TEntity> {
-  equals(value: boolean): Expression<TEntity>;
-  isTrue(): Expression<TEntity>;
-  isFalse(): Expression<TEntity>;
+  equals(value: boolean): ExpressionProxy<TEntity>;
+  isTrue(): ExpressionProxy<TEntity>;
+  isFalse(): ExpressionProxy<TEntity>;
 }

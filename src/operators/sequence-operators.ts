@@ -1,7 +1,7 @@
-import { Expression, ExpressionWithOptions } from "../core/expression";
+import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/expression-proxy";
 import { StandardOperators, BetweenOperatorOptions } from "./standard-operators";
 
 export type SequenceOperators<T, TEntity> = StandardOperators<T, TEntity> & {
-  startsWith(prefix: T): Expression<TEntity>;
-  startsWithAnyOf(prefixes: T[]): Expression<TEntity>;
+  startsWith(prefix: T): ExpressionProxy<TEntity>;
+  startsWithAnyOf(prefixes: T[]): ExpressionProxy<TEntity>;
 }
