@@ -9,8 +9,6 @@ export interface StandardOperators<T, TEntity> {
   belowOrEqual(value: T): ExpressionProxy<TEntity>;
   between(from: T, to: T): ExpressionProxyWithOptions<TEntity, BetweenOperatorOptions>;
   anyOf(values: T[]): ExpressionProxy<TEntity>;
-  noneOf(values: T[]): ExpressionProxy<TEntity>;
-  notEqual(value: T): ExpressionProxy<TEntity>;
 }
 
 export interface BetweenOperatorOptions {

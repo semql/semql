@@ -1,6 +1,7 @@
 import { EntityProxy } from "./entity-proxy";
 import { ExpressionProxy } from "./expression-proxy";
 import { Introspect } from "../symbols";
+import { addOption } from "./options";
 
 const FUNC = function(){};
 
@@ -27,23 +28,31 @@ export function createProxy<TEntity=any> (
     apply: function (target, thiz, args) {
       const pMethod = propPath.length - 1;
       const method = propPath[pMethod];
-      return type === ProxyType.Entity ?
+      return type === ProxyType.Entity ? // address.street.equals("D") - "equals" is method, ["D"] is args.
         createProxy([], [
-          propPath.slice(0, pMethod).join('.'),
-          method,
-          args.length > 2 ? args :
+          propPath.slice(0, pMethod).join('.'), // "address.street"
+          method, // equals, above, below, some, etc...
+          args.length > 1 ?
+            // Args is not a single argument. Let args parameter contain all args as the array it is.
+            args :
+            // Is the argument a function such as cars.some(car => car.brand.equals(volvo))?
             typeof args[0] === 'function' ?
+              // Argument is a JS expression such as cars.some(...). Evaluate it:
               args[0](createProxy())[Introspect].expr :
+              // Argument is a single argument containing a value
               args[0]
         ], ProxyType.Expression) :
         method === "AND" || method === "OR" ?
+          // Combined expression. Evalute right value and combine it (method is the logical operator):
           createProxy([], [expr, method, args[0][Introspect].expr], ProxyType.Expression) :
+          // Option. Clone the expression proxy with options applied
           createProxy([], [
-            ...expr!,
-            args.length > 0 ?
-              [method, ...args] :
-              method
+            expr![0],
+            expr![1],
+            expr![2],
+            addOption(expr![3], method as string, args)
           ], ProxyType.Expression);
     }
   }) as any as EntityProxy<TEntity>;
 }
+

@@ -11,11 +11,12 @@ export interface StringOperators<TEntity> {
   startsWith(prefix: string): ExpressionProxyWithOptions<TEntity, StringOperatorOptions>;
   startsWithAnyOf(prefixes: string[]): ExpressionProxyWithOptions<TEntity, StringOperatorOptions>;
   anyOf(values: string[]): ExpressionProxyWithOptions<TEntity, StringOperatorOptions>;
-  noneOf(values: string[]): ExpressionProxyWithOptions<TEntity, StringOperatorOptions>;
-  notEqual(value: string): ExpressionProxyWithOptions<TEntity, StringOperatorOptions>;
 }
 
 export interface StringOperatorOptions {
   ignoreCase(): void;
-  ignoreAccents(): void;
+  matchCase(): void;
+  ignoreAccent(): void;
+  matchAccent(): void;
+  locale(locale: string): void;
 }

@@ -1,3 +1,5 @@
+import { Options } from "./options";
+
 /** Expression.
  * 
  * Expression is an array, where:
@@ -5,7 +7,7 @@
  *  Position 0 contains the left-value (property name or another expression)
  *  Position 1 contains the operator (such as "AND", "OR, "above", "below", "equals", etc...)
  *  Position 2 contains the right-value (key to compare, or another expression)
- *  Position 3...N contains options available for the particular type and operator.
+ *  Position 3 contains options available for the particular type and operator.
  * 
  */
 export type Expression =
@@ -18,6 +20,7 @@ export const POS_LEFT_EXPR = 0;
 export const POS_OPERATOR = 1;
 export const POS_ARGUMENTS = 2;
 export const POS_RIGHT_EXPR = 2;
+export const POS_OPTIONS = 3;
 
 /** CompareExpression.
  * 
@@ -31,7 +34,7 @@ export type CompareExpression = {
   [POS_PROPNAME]: string  // Such as "address.city" or "age"
   [POS_OPERATOR]: string  // Such as "startsWith" or "between"
   [POS_ARGUMENTS]: any | any[] // Such as "Stockholm" or [25, 50]
-  [option: number]: any | any[] // Such as "ignoreCase" or ["excludeUpper", "excludeLower"]
+  [POS_OPTIONS]?: Options // Such as "ignoreCase" or ["excludeUpper", "excludeLower"]
 }
 
 /** CombinedExpression.
@@ -49,7 +52,7 @@ export type CombinedExpression = {
   [POS_LEFT_EXPR]: Expression
   [POS_OPERATOR]: 'AND' | 'OR' | 'NOT AND' | 'NOT OR'
   [POS_RIGHT_EXPR]: Expression
-  [option: number]: any | any[] // May contain least common denominator of options for contained expressions
+  [POS_OPTIONS]?: Options // May contain least common denominator of options for contained expressions
 }
 
 

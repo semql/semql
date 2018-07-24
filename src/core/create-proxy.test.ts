@@ -40,7 +40,7 @@ test('create-entity-proxy', () => {
       "name",
       "startsWithAnyOf",
       ["D", "Y"],
-      "ignoreCase"
+      {ignoreCase: true} 
     ]
   );
 
@@ -70,7 +70,7 @@ test('create-entity-proxy', () => {
 
     tags.includes("friend").AND(
       name.equals("Arne").ignoreCase()
-    ).AND(cars.every(({ model }) => model.equals("V70").ignoreCase()))
+    ).AND(cars.every(({ model }) => model.equals("V70").ignoreCase().locale("sv-se")))
       .AND(age.above(1)), [[[
         [
           "tags",
@@ -82,7 +82,9 @@ test('create-entity-proxy', () => {
           "name",
           "equals",
           "Arne",
-          "ignoreCase"
+          {
+            "ignoreCase": true
+          }
         ]
       ],
         "AND",
@@ -93,7 +95,10 @@ test('create-entity-proxy', () => {
           "model",
           "equals",
           "V70",
-          "ignoreCase"
+          {
+            "ignoreCase": true,
+            "locale": "sv-se"
+          }
         ]
       ]
       ],
@@ -136,5 +141,34 @@ test('create-entity-proxy', () => {
     [
       "name", "startsWith", "Apa"
     ],
-    "ignoreCase"]);
+    {"ignoreCase": true}]);
+});
+
+test('antiOptions', () => {
+  verify<Friend>(({name}) => name.equals("David").ignoreCase().matchCase(), [
+    "name",
+    "equals",
+    "David",
+    {matchCase: true}
+  ])
+});
+
+test ('between', ()=> {
+  verify<Friend>(({age}) => age.between(20, 25), [
+    "age",
+    "between",
+    [20, 25]
+  ]);
+});
+
+test ('some with item access', ()=> {
+  verify<Friend>(f => f.tags.some(tag => tag.startsWith("f")), [
+    "tags",
+    "some",
+    [
+      "",
+      "startsWith",
+      "f"
+    ]
+  ]);
 });
