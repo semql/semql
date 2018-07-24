@@ -1,4 +1,5 @@
 import { Expression } from "../../core/expression";
+import { OrderBySpec } from "../datastore/orderby";
 
 export interface Query {
   where?: Expression;
@@ -13,11 +14,7 @@ export interface ListQuery extends Query {
     string, // property name (related property)
     undefined | ListQuery // 
   ]>;
-  orderBy?: Array<[
-    string,              // propertyName
-    boolean | undefined, // bAscending?
-    string | undefined   // collationName?
-  ]>;
+  orderBy?: OrderBySpec[];
   paging?: Array<'next' | 'prev' | 'totalPages'>;
 }
 
