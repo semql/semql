@@ -161,7 +161,7 @@ test ('between', ()=> {
   ]);
 });
 
-test ('some with item access', ()=> {
+test ('some() with item access', ()=> {
   verify<Friend>(f => f.tags.some(tag => tag.startsWith("f")), [
     "tags",
     "some",

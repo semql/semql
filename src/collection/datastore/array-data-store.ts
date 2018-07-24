@@ -17,7 +17,7 @@ export class ArrayDataStore implements DataStore {
     // await that collection's result.
     let result = where ?
       this.a.filter(createFilter(where, {})) :
-      this.a;
+      this.a.slice(0);
     if (orderBy) {
       result = result.sort(getCompoundSortFunction(orderBy))
     }
@@ -43,7 +43,7 @@ export class ArrayDataStore implements DataStore {
       if (pagingSpec.totalPages) {
         pagingResult.totalPages = Math.ceil(this.a.length / (limit || 0));
       }
-      return {result, paging: pagingResult};
+      response.paging = pagingResult;
     }
 
     if (select) {
