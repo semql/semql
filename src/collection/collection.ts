@@ -5,6 +5,7 @@ import { createProxy } from "../core/create-proxy";
 import { Introspect } from "../symbols";
 import { ExportableExpressionProxy } from "../core/expression-proxy";
 import { Expression } from "../core/expression";
+import { ChainedDataStore } from "./datastore/chained-data-store";
 
 export class Collection<TEntity> {
   _dataStore: DataStore;
@@ -14,26 +15,35 @@ export class Collection<TEntity> {
 
   constructor (dataStore: DataStore, query: ListQuery) {
     this._dataStore = dataStore;
-    this._query = {};
+    this._query = query;
   }
 
-  private clone(query: ListQuery) : this {
-    return new (this.constructor as CollectionConstructor<TEntity>)[Symbol.species](
-      this._dataStore, query) as this;
+  public query(query: ListQuery) : this {
+    const {limit, offset, where} = this._query;
+    const hasLimitOrOffset = (limit != null && limit !== Infinity) || !offset;
+    const Collection = (this.constructor as CollectionConstructor<TEntity>)[Symbol.species];
+    if (hasLimitOrOffset) {
+      // Limit / offset must be applied on current collection before the query changes
+      return new Collection(new ChainedDataStore(this), query) as this;
+    } else if (where && query.where) {
+      // Make a combo of current where() with new where() using AND operator:
+      return new Collection(
+        this._dataStore, {...this._query, ...query, where: [where, "AND", query.where]}) as this;
+    } else {
+      // Just combine the two ("where" is either on previous, current or none of them)
+      return new Collection(
+        this._dataStore, {...this._query, ...query}
+      ) as this;
+    }
   }
 
   where (jsExpression: JsExpression<TEntity>): this {
-    const {where} = this._query;
     const proxy = createProxy<TEntity>();
-    const introspected = (jsExpression(proxy) as ExportableExpressionProxy)[Introspect];
+    const expressionProxy = jsExpression(proxy);
+    const introspected = (expressionProxy as ExportableExpressionProxy)[Introspect];
     if (!introspected) throw new Error("Invalid return value from JS expression");
     const expression = introspected.expr;
-    return this.clone({
-      ...this._query,
-      where: (where ?
-        [where, "AND", expression] as Expression :
-        expression)
-    });
+    return this.query({where: expression});
   }
 
   toArray(): Promise<TEntity[]> {

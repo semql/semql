@@ -24,5 +24,5 @@ export type EntityProxy<T, TEntity=T> =
   T extends {[SemqlOperators]?: any} ?
     CustomOperators<ReturnType<T[typeof SemqlOperators]>, T, TEntity> & {[P in keyof T]: EntityProxy<T[P], TEntity>} :
   T extends {[ReferenceTo]?: infer U} ?
-    {[P in keyof U]: EntityProxy<U[P], TEntity>} :
-    {[P in keyof T]: EntityProxy<T[P], TEntity>};
+    {[P in keyof U]-?: EntityProxy<U[P], TEntity>} :
+    {[P in keyof T]-?: EntityProxy<T[P], TEntity>};

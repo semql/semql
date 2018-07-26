@@ -1,10 +1,10 @@
-import { getKeyExtractor } from "./create-filter";
+import { getKeyExtractor } from "./create-expression-filter";
 
 export const POS_PROPNAME = 0;
 export const POS_ASCENDING = 1;
 export const POS_COLLATION_NAME = 2;
 
-export type OrderBySpec = [string] & {
+export type OrderBySpec = ([string] | [string, boolean] | [string, boolean, string]) & {
   [POS_PROPNAME]: string;
   [POS_ASCENDING]?: boolean;
   [POS_COLLATION_NAME]?: string

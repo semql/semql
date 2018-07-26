@@ -8,7 +8,8 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/dist/core/create-entity-proxy.test.js"
+      "program1": "${workspaceFolder}/dist/core/create-entity-proxy.test.js",
+      "program": "${workspaceFolder}/dist/collection/datastore/array-data-store.test.js"
     },
     {
       "type": "node",

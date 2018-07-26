@@ -8,13 +8,13 @@ import { ExpressionProxy, ExportableExpressionProxy } from "./expression-proxy";
 interface Friend {
   name: string;
   age: number;
-  tags: string[];
-  cars: Car[];
+  tags?: string[];
+  cars?: Car[];
 }
 
 interface Car {
   brand: string;
-  model: string;
+  model?: string;
 }
 
 function verify<T>(jsExpr: JsExpression<T>, expectedResult: any[]) {

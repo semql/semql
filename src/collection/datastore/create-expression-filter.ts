@@ -23,7 +23,7 @@ export function getKeyExtractor(keyPath: string) {
   }
 }
 
-export function createFilter (expression: Expression, opts: Options): FilterFunction {
+export function createExpressionFilter (expression: Expression, opts: Options): FilterFunction {
   const [lvalue, op, rvalue, opts2] = expression;
   const options = opts && opts2 ?
       combineOptions(opts, opts2) :
@@ -36,7 +36,7 @@ export function createFilter (expression: Expression, opts: Options): FilterFunc
     const opers = opFns.map(op => typeof op === 'function' ? {operator: op} : op);
     const comparer = getComparer(options);
     const resoledRvalue = subExpressionOperators[op] ?
-      createFilter(rvalue, options) :
+      createExpressionFilter(rvalue, options) :
       rvalue;
     return (val: any) => {
       const lvalue = extractKey(val);
@@ -49,8 +49,8 @@ export function createFilter (expression: Expression, opts: Options): FilterFunc
       return false;
     };
   } else {
-    const leftFilter = createFilter(lvalue, options);
-    const rightFilter = createFilter(rvalue, options);
+    const leftFilter = createExpressionFilter(lvalue, options);
+    const rightFilter = createExpressionFilter(rvalue, options);
     switch (op) {
       case 'AND': return (val: any) => leftFilter(val) && rightFilter(val);
       case 'NOT AND': return (val: any) => !(leftFilter(val) && rightFilter(val));

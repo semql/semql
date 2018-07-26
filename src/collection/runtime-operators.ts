@@ -1,9 +1,6 @@
 import { PrimitiveType } from "../utils/primitive-type";
 import { getArrayLike } from "../utils/get-array-like";
 import { Options } from "../core/options";
-import { Expression } from "../core/expression";
-import { Collection } from "./collection";
-import { createFilter } from "./datastore/create-filter";
 
 
 export type RegisteredOperator = {
@@ -23,6 +20,7 @@ function startsWith(
     if (lLength < rLength) return false;
     return cmp(lval.substr(0, rLength), rval) === 0;
   }
+  if (!lval) return false;
   const lArray = getArrayLike(lval);
   const rArray = getArrayLike(rval);
   const lLength = lArray.length;
@@ -38,6 +36,14 @@ function startsWith(
     if (lArray[i] != rArray[i]) return false;
   }
   return true;
+}
+
+function some (lvals: Iterable<any>, subFilter:(x: any) => boolean) {
+  if (!lvals || !lvals[Symbol.iterator]) return false;
+  for (const entry of (lvals as Iterable<any>)) {
+    if (subFilter(entry)) return true;
+  }
+  return false;
 }
 
 export const runtimeOperators: {[operatorName: string]: RegisteredOperator[]} = {
@@ -64,22 +70,33 @@ export const runtimeOperators: {[operatorName: string]: RegisteredOperator[]} = 
     (lval, rvals: (string | ArrayBuffer | Array<PrimitiveType> | ArrayBufferView | DataView)[], cmp) =>
       rvals.some(rval => startsWith(lval, rval, cmp))
   ],
-  some: [(lvals: any[] | Collection<any>, subFilter:(x: any) => boolean) => {
-    if (Array.isArray(lvals)) {
-      return lvals.some(lval => subFilter(lval));
+  some: [some],
+  every: [(lvals: Iterable<any>, subFilter:(x: any) => boolean) => {
+    if (!lvals[Symbol.iterator]) return false;
+    for (const entry of (lvals as Iterable<any>)) {
+      if (!subFilter(entry)) return false;
     }
-    throw new Error("Collections in sub expressions not yet supported");
+    return true;
   }],
-  every: [(lvals: any[] | Collection<any>, subFilter:(x: any) => boolean) => {
-    if (Array.isArray(lvals)) {
-      return lvals.every(lval => subFilter(lval));
-    }
-    throw new Error("Collections in sub expressions not yet supported");
+  includes: [(lvals: Iterable<any>, expectedVal: any, cmp) => {
+    if (!lvals[Symbol.iterator]) return false;
+    return some(lvals, entry => cmp(entry, expectedVal) === 0);
   }],
+  includesAnyOf: [(lvals: Iterable<any>, expectedVals: any[], cmp) => {
+    if (!lvals[Symbol.iterator]) return false;
+    return some(lvals, entry => expectedVals.some(val => cmp(entry, val) === 0));
+  }],
+  includesAll: [(lvals: Iterable<any>, expectedVals: any[], cmp) => {
+    if (!lvals[Symbol.iterator]) return false;
+    return some(lvals, entry => expectedVals.every(val => cmp(entry, val) === 0));
+  }]
 };
 
 
 export const subExpressionOperators: {[op: string]: true} = {
   some: true,
-  every: true
+  every: true,
+  includes: true,
+  includesAnyOf: true,
+  includesAll: true
 }
