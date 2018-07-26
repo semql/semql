@@ -6,6 +6,7 @@ import { Introspect } from "../symbols";
 import { ExportableExpressionProxy } from "../core/expression-proxy";
 import { Expression } from "../core/expression";
 import { ChainedDataStore } from "./datastore/chained-data-store";
+import { OrderBySpec } from "./datastore/orderby";
 
 export class Collection<TEntity> {
   _dataStore: DataStore;
@@ -44,6 +45,19 @@ export class Collection<TEntity> {
     if (!introspected) throw new Error("Invalid return value from JS expression");
     const expression = introspected.expr;
     return this.query({where: expression});
+  }
+
+  orderBy (...properties: (JsExpression<TEntity> | (keyof TEntity))[]): this {
+    const orderBy = properties.map(p => typeof p === 'string' ?
+      [p, true] :
+      [((p as JsExpression<TEntity>)(createProxy<TEntity>()) as ExportableExpressionProxy)[Introspect].propPath])
+    return this.query({orderBy: orderBy as OrderBySpec[]})
+  }
+
+  select (...properties: (keyof TEntity)[]) {
+    return this.query({
+      select: properties as string[]
+    });
   }
 
   toArray(): Promise<TEntity[]> {

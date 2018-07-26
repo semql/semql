@@ -102,10 +102,13 @@ test("where", async ()=>{
 });
 
 test ("orderBy-ascending-locale-en-us", async ()=>{
-  const ordered1 = await c.query({
+  /*const ordered1 = await c.query({
     orderBy: [["name", true, "en-us"]],
     select: ["name"]
-  }).toArray();
+  }).toArray();*/
+  //debugger;
+  const ordered1 = await c.orderBy("name").select("name").toArray();
+  //debugger;
   expect(ordered1).toEqual([
     {name: "David"},
     {name: "Örjan"},
