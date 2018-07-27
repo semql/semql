@@ -112,9 +112,9 @@ test ("orderBy-ascending-locale-en-us", async ()=>{
   }).toArray();*/
   //debugger;
   //c.orderBy(f => f.address.city)
-  c.orderBy("name").orderBy({address:"street"})
-  const ordered1 = await c.orderBy("name").select("name").toArray();
-  //debugger;
+  const ordered1 = await c.orderBy(f => f.name).select("name").toArray();
+  
+  console.log(JSON.stringify(ordered1, null ,4))
   expect(ordered1).toEqual([
     {name: "David"},
     {name: "Örjan"},

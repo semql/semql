@@ -48,8 +48,10 @@ export class Collection<TEntity> {
     return this.query({where: expression});
   }
 
-  orderBy (...properties: (OrderByArgType<Required<TEntity>>)[]): this {
-    const orderBy = properties.map(p => [p, true])
+  orderBy (...properties: (OrderByArgType<Required<TEntity>> | OrderByExpression<Required<TEntity>>)[]): this {
+    const orderBy = properties.map(p => typeof p === 'string' ?
+      [p, true] :
+      [((p as any)(createProxy()) as ExportableExpressionProxy)[Introspect].propPath.join('.'), true])
     return this.query({orderBy: orderBy as OrderBySpec[]})
   }
 
@@ -69,19 +71,20 @@ export interface CollectionConstructor<TEntity=any> {
   [Symbol.species]: CollectionConstructor<TEntity>;
 }
 
-// Below: A try to allow nested arguments in orderBy:
-//
-//    "name" | "age" | {address: "city" | "street"}
-//
-// However, it did not work out in Typescript 2.9.2. On first level, it dit,
-// but nested props always ended up as {propname: never}
-//
 export type OrderByArgType<TEntity> = OrderByArgumentType<keyof TEntity, TEntity>;
 export type OrderByArgumentType<T, TEntity> =
     T extends keyof TEntity ?
       TEntity[T] extends PrimitiveType ?
         T :
-        TEntity[T] extends Array<any> ?
-          never :
-          {[P in T]: OrderByArgType<Required<TEntity[P]>>} :
+        never :
       never;
+
+export type OrderByExpression<TEntity> = (entry: OrderByProxy<TEntity>) => PropPathProxy;
+
+export const PropPathSymbol = Symbol();
+export type PropPathProxy = typeof PropPathSymbol;
+
+export type OrderByProxy<T> = 
+  T extends PrimitiveType ? PropPathProxy :
+  T extends Array<any> ? any :
+  {[P in keyof T]-?: OrderByProxy<T[P]>};

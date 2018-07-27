@@ -1,4 +1,5 @@
 import { getKeyExtractor } from "./create-expression-filter";
+import { getComparer } from "../compare";
 
 export const POS_PROPNAME = 0;
 export const POS_ASCENDING = 1;
@@ -12,7 +13,8 @@ export type OrderBySpec = ([string] | [string, boolean] | [string, boolean, stri
 
 export function getSortFunction (orderBy: OrderBySpec) : (a: any, b: any) => number {
   const [propName, bAscending, collationName] = orderBy;
-  const {compare} = new Intl.Collator (collationName);
+  //const {compare} = new Intl.Collator (collationName);
+  const compare = getComparer({locale: collationName});
   const extractKey = getKeyExtractor(propName);
   return (a: any, b:any) => bAscending ?
     compare(extractKey(a), extractKey(b)) :
