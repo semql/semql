@@ -8,6 +8,10 @@ interface Friend {
   age: number;
   tags?: string[];
   cars?: Car[];
+  address?: {
+    city: string;
+    street: string;
+  }
 }
 
 interface Car {
@@ -107,6 +111,8 @@ test ("orderBy-ascending-locale-en-us", async ()=>{
     select: ["name"]
   }).toArray();*/
   //debugger;
+  //c.orderBy(f => f.address.city)
+  c.orderBy("name").orderBy({address:"street"})
   const ordered1 = await c.orderBy("name").select("name").toArray();
   //debugger;
   expect(ordered1).toEqual([

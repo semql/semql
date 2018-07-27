@@ -7,6 +7,7 @@ import { ExportableExpressionProxy } from "../core/expression-proxy";
 import { Expression } from "../core/expression";
 import { ChainedDataStore } from "./datastore/chained-data-store";
 import { OrderBySpec } from "./datastore/orderby";
+import { PrimitiveType } from "../utils/primitive-type";
 
 export class Collection<TEntity> {
   _dataStore: DataStore;
@@ -47,10 +48,8 @@ export class Collection<TEntity> {
     return this.query({where: expression});
   }
 
-  orderBy (...properties: (JsExpression<TEntity> | (keyof TEntity))[]): this {
-    const orderBy = properties.map(p => typeof p === 'string' ?
-      [p, true] :
-      [((p as JsExpression<TEntity>)(createProxy<TEntity>()) as ExportableExpressionProxy)[Introspect].propPath])
+  orderBy (...properties: (OrderByArgType<Required<TEntity>>)[]): this {
+    const orderBy = properties.map(p => [p, true])
     return this.query({orderBy: orderBy as OrderBySpec[]})
   }
 
@@ -69,3 +68,20 @@ export interface CollectionConstructor<TEntity=any> {
   new (dataStore: DataStore, query: ListQuery): Collection<TEntity>;
   [Symbol.species]: CollectionConstructor<TEntity>;
 }
+
+// Below: A try to allow nested arguments in orderBy:
+//
+//    "name" | "age" | {address: "city" | "street"}
+//
+// However, it did not work out in Typescript 2.9.2. On first level, it dit,
+// but nested props always ended up as {propname: never}
+//
+export type OrderByArgType<TEntity> = OrderByArgumentType<keyof TEntity, TEntity>;
+export type OrderByArgumentType<T, TEntity> =
+    T extends keyof TEntity ?
+      TEntity[T] extends PrimitiveType ?
+        T :
+        TEntity[T] extends Array<any> ?
+          never :
+          {[P in T]: OrderByArgType<Required<TEntity[P]>>} :
+      never;
