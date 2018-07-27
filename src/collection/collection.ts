@@ -55,10 +55,10 @@ export class Collection<TEntity> {
     return this.query({orderBy: orderBy as OrderBySpec[]})
   }
 
-  select (...properties: (keyof TEntity)[]) {
+  select<TKey extends keyof TEntity> (...properties: TKey[]): Collection<{[P in TKey]: TEntity[P]}> {
     return this.query({
       select: properties as string[]
-    });
+    }) as any;
   }
 
   toArray(): Promise<TEntity[]> {
