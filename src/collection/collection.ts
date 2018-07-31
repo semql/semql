@@ -1,90 +1,41 @@
-import { Query, ListQuery } from "./query";
-import { DataStore } from "./datastore";
-import { JsExpression } from "../core/js-expression";
-import { createProxy } from "../core/create-proxy";
-import { Introspect } from "../symbols";
-import { ExportableExpressionProxy } from "../core/expression-proxy";
-import { Expression } from "../core/expression";
-import { ChainedDataStore } from "./datastore/chained-data-store";
-import { OrderBySpec } from "./datastore/orderby";
-import { PrimitiveType } from "../utils/primitive-type";
+import { ReadonlyCollection } from './readonly-collection';
+import { createExpressionFilter } from './datastore/create-expression-filter';
 
-export class Collection<TEntity> {
-  _dataStore: DataStore;
-  _query: ListQuery;
-
+export class Collection<TEntity> extends ReadonlyCollection<TEntity> {
   static get [Symbol.species]() { return this; }
 
-  constructor (dataStore: DataStore, query: ListQuery) {
-    this._dataStore = dataStore;
-    this._query = query;
-  }
-
-  public query(query: ListQuery) : this {
-    const {limit, offset, where} = this._query;
-    const hasLimitOrOffset = (limit != null && limit !== Infinity) || !offset;
-    const Collection = (this.constructor as CollectionConstructor<TEntity>)[Symbol.species];
-    if (hasLimitOrOffset) {
-      // Limit / offset must be applied on current collection before the query changes
-      return new Collection(new ChainedDataStore(this), query) as this;
-    } else if (where && query.where) {
-      // Make a combo of current where() with new where() using AND operator:
-      return new Collection(
-        this._dataStore, {...this._query, ...query, where: [where, "AND", query.where]}) as this;
-    } else {
-      // Just combine the two ("where" is either on previous, current or none of them)
-      return new Collection(
-        this._dataStore, {...this._query, ...query}
-      ) as this;
+  async bulkInsert(entities: TEntity[]): Promise<void> {
+    if (this._query.where) {
+      const filter = createExpressionFilter(this._query.where, {});
+      const notWithinFilter = entities.filter(e => !filter(e));
+      if (notWithinFilter.length > 0) {
+        // THOUGHTS: Think about the use cases:
+        // 1: Access Control. where clause demands some accepted aclids (where(x => x.aclids.anyOf(aclids)))
+        //    Could we have a default aclid here? Or should this type of filtering only occur in the backend?
+        // 2: Relational: Friend.cars is a collection where (car => car.friend.id.equals(friend.id))
+        //    Since it is a specific value required, should we fill it in for the user?
+        if (notWithinFilter.length === 1) {
+          // TODO: Create specific Error type and name.
+          throw new Error(`Entity would not pass collection's where clause: ${JSON.stringify(notWithinFilter[0])}`);
+        } else {
+          throw new Error(`Entities would not pass collection's where clause: ${JSON.stringify(notWithinFilter)}`);
+        }
+      }
     }
+    await this._dataStore.mutate!([{op: 'insert', entities}]);
   }
 
-  where (jsExpression: JsExpression<TEntity>): this {
-    const proxy = createProxy<TEntity>();
-    const expressionProxy = jsExpression(proxy);
-    const introspected = (expressionProxy as ExportableExpressionProxy)[Introspect];
-    if (!introspected) throw new Error("Invalid return value from JS expression");
-    const expression = introspected.expr;
-    return this.query({where: expression});
+  async insert(entity: TEntity): Promise<void> {
+    await this.bulkInsert([entity]);
   }
 
-  orderBy (...properties: (OrderByArgType<Required<TEntity>> | OrderByExpression<Required<TEntity>>)[]): this {
-    const orderBy = properties.map(p => typeof p === 'string' ?
-      [p, true] :
-      [((p as any)(createProxy()) as ExportableExpressionProxy)[Introspect].propPath.join('.'), true])
-    return this.query({orderBy: orderBy as OrderBySpec[]})
+  async bulkDelete(keys: any[]): Promise<number> {
+    const res = await this._dataStore.mutate!([{op: 'delete', keys, where: this._query.where}]);
+    return res[0] as number;
   }
 
-  select<TKey extends keyof TEntity> (...properties: TKey[]): Collection<{[P in TKey]: TEntity[P]}> {
-    return this.query({
-      select: properties as string[]
-    }) as any;
-  }
-
-  toArray(): Promise<TEntity[]> {
-    return this._dataStore.list(this._query).then(({result}) => result);
+  async delete(key: any): Promise<boolean> {
+    const res = await this.bulkDelete([key]);
+    return res > 0;
   }
 }
-
-export interface CollectionConstructor<TEntity=any> {
-  new (dataStore: DataStore, query: ListQuery): Collection<TEntity>;
-  [Symbol.species]: CollectionConstructor<TEntity>;
-}
-
-export type OrderByArgType<TEntity> = OrderByArgumentType<keyof TEntity, TEntity>;
-export type OrderByArgumentType<T, TEntity> =
-    T extends keyof TEntity ?
-      TEntity[T] extends PrimitiveType ?
-        T :
-        never :
-      never;
-
-export type OrderByExpression<TEntity> = (entry: OrderByProxy<TEntity>) => PropPathProxy;
-
-export const PropPathSymbol = Symbol();
-export type PropPathProxy = typeof PropPathSymbol;
-
-export type OrderByProxy<T> = 
-  T extends PrimitiveType ? PropPathProxy :
-  T extends Array<any> ? any :
-  {[P in keyof T]-?: OrderByProxy<T[P]>};

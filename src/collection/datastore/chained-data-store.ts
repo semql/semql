@@ -1,11 +1,11 @@
 import { DataStore } from "./datastore";
-import { Collection } from "../collection";
+import { ReadonlyCollection } from "../readonly-collection";
 import { ListResponse, ListQuery } from "../query";
 import { applyQueryToArray } from "./apply-query-to-array";
 
 export class ChainedDataStore implements DataStore {
-  collection: Collection<any>;
-  constructor (collection: Collection<any>) {
+  collection: ReadonlyCollection<any>;
+  constructor (collection: ReadonlyCollection<any>) {
     this.collection = collection;
   }
 

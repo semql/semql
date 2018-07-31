@@ -4,5 +4,5 @@ export interface DataStore {
   list(query: ListQuery): Promise<ListResponse>;
   count?(query: Query): Promise<number>;
   get?(req: GetRequest): Promise<any[]>;
-  mutate?(reqs: MutationRequest[]): Promise<number | undefined>;
+  mutate?(reqs: MutationRequest[]): Promise<Array<number | undefined>>;
 }

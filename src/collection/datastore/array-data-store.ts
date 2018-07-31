@@ -31,7 +31,7 @@ export class ArrayDataStore implements DataStore {
     return keys.map(key => this.a.find(entity => comparer(extractKey(entity), key) === 0));
   }
 
-  mutate(reqs: MutationRequest[]): Promise<number | undefined> {
+  mutate(reqs: MutationRequest[]): Promise<Array<number | undefined>> {
     throw new Error ("Not implemented!");
   }
 }
