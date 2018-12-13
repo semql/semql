@@ -21,8 +21,8 @@ export interface ReadonlyCollection<T> extends Observable<Entity<T>[]> {
 }
 
 export interface Collection<T> extends ReadonlyCollection<T> {
-  add (...values: T[]);
-  remove (criteria?);
+  add (...values: T[]); // Om array, push(), om navprop link (+add om nya), om global collection, add().
+  remove (criteria?); // Collection är navprop: avreferering, om array, splice, om global collcetion, delete.
 }
 
 export type Entity<T> = T & EntityMethods<T>;
