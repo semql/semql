@@ -1,4 +1,4 @@
-import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/expression-proxy";
+import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/where-expression-proxy";
 import { StandardOperators, BetweenOperatorOptions } from "./standard-operators";
 
 export type SequenceOperators<T, TEntity> = StandardOperators<T, TEntity> & {

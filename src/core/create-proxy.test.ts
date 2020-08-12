@@ -1,9 +1,9 @@
 import { EntityProxy } from "./entity-proxy";
 import { createProxy } from "./create-proxy";
-import { JsExpression } from "./js-expression";
+import { WhereExpression } from "./where-expression";
 import { Introspect } from "../symbols";
 import { NOT } from "./not";
-import { ExpressionProxy, ExportableExpressionProxy } from "./expression-proxy";
+import { BooleanExpression, ExportableExpressionProxy } from "./where-expression-proxy";
 
 interface Friend {
   name: string;
@@ -17,7 +17,7 @@ interface Car {
   model?: string;
 }
 
-function verify<T>(jsExpr: JsExpression<T>, expectedResult: any[]) {
+function verify<T>(jsExpr: WhereExpression<T>, expectedResult: any[]) {
   const {expr, propPath, type} = (jsExpr(createProxy<T>()) as ExportableExpressionProxy)[Introspect];
   expect(expr).toEqual(expectedResult);
 }

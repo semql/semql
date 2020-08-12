@@ -1,4 +1,4 @@
-import { ExpressionProxy } from "../core/expression-proxy";
+import { ExpressionProxy } from "../core/where-expression-proxy";
 
 type IsValidArg<T> = T extends object ? keyof T extends never ? false : true : true;
 type MakeOperatorMethod<TOp, T, TEntity> = TOp extends (thiz: T, a: infer A, b: infer B, c: infer C, d: infer D) => boolean ? (

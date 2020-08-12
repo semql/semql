@@ -10,9 +10,9 @@ import { Options } from "./options";
  *  Position 3 contains options available for the particular type and operator.
  * 
  */
-export type Expression =
+export type ExpressionJson =
   [any, string, any] & // Expression is an array with operator string on position 1.
-  (CompareExpression | CombinedExpression); // Positions 0, 2 and ...rest depends on operator.
+  (CompareExpressionJson | CombinedExpressionJson); // Positions 0, 2 and ...rest depends on operator.
 
 
 export const POS_PROPNAME = 0;
@@ -30,7 +30,7 @@ export const POS_OPTIONS = 3;
  *  ["address.city", "startsWith", "S", "ignoreCase"]
  * 
  */
-export type CompareExpression = {
+export type CompareExpressionJson = {
   [POS_PROPNAME]: string  // Such as "address.city" or "age"
   [POS_OPERATOR]: string  // Such as "startsWith" or "between"
   [POS_ARGUMENTS]: any | any[] // Such as "Stockholm" or [25, 50]
@@ -48,10 +48,10 @@ export type CompareExpression = {
  *  ]
  * 
  */
-export type CombinedExpression = {
-  [POS_LEFT_EXPR]: Expression
+export type CombinedExpressionJson = {
+  [POS_LEFT_EXPR]: ExpressionJson
   [POS_OPERATOR]: 'AND' | 'OR' | 'NOT AND' | 'NOT OR'
-  [POS_RIGHT_EXPR]: Expression
+  [POS_RIGHT_EXPR]: ExpressionJson
   [POS_OPTIONS]?: Options // May contain least common denominator of options for contained expressions
 }
 

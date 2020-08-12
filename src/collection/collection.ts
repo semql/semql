@@ -5,6 +5,11 @@ export class Collection<TEntity> extends ReadonlyCollection<TEntity> {
   static get [Symbol.species]() { return this; }
 
   async bulkInsert(entities: TEntity[]): Promise<void> {
+    this.checkWhereCriteria(entities);
+    await this._dataStore.mutate!([{op: 'insert', entities}]);
+  }
+
+  private checkWhereCriteria(entities: TEntity[]) {
     if (this._query.where) {
       const filter = createExpressionFilter(this._query.where, {});
       const notWithinFilter = entities.filter(e => !filter(e));
@@ -17,12 +22,12 @@ export class Collection<TEntity> extends ReadonlyCollection<TEntity> {
         if (notWithinFilter.length === 1) {
           // TODO: Create specific Error type and name.
           throw new Error(`Entity would not pass collection's where clause: ${JSON.stringify(notWithinFilter[0])}`);
-        } else {
+        }
+        else {
           throw new Error(`Entities would not pass collection's where clause: ${JSON.stringify(notWithinFilter)}`);
         }
       }
     }
-    await this._dataStore.mutate!([{op: 'insert', entities}]);
   }
 
   async insert(entity: TEntity): Promise<void> {
@@ -38,4 +43,34 @@ export class Collection<TEntity> extends ReadonlyCollection<TEntity> {
     const res = await this.bulkDelete([key]);
     return res > 0;
   }
+
+  async clear(): Promise<void> {
+    await this._dataStore.mutate!([{op: 'delete', where: this._query.where}]);
+  }
+
+  async update(key: any, changes: Partial<TEntity>): Promise<number> {
+    const res = await this._dataStore.mutate!([{op: 'update', where: this._query.where, keys: [key]}]);
+    return res[0] as number;
+  }
+
+  async modify(changes: Partial<TEntity>): Promise<void> {
+    await this._dataStore.mutate!([{op: 'update', where: this._query.where}]);
+  }
+
+  async bulkUpsert(entities: TEntity[]): Promise<void> {
+    this.checkWhereCriteria(entities); // TODO: Think about if this check generally should be performed by the store itself instead!
+    await this._dataStore.mutate!([{op: 'upsert', where: this._query.where, entities}]);
+  }
+
+  async upsert(entity: TEntity): Promise<void> {
+    await this.bulkUpsert([entity]);
+  }
 }
+
+/*var c = null as any as Collection<{hej: string}>;
+c.update(4, f => f.name = name);
+c.update(4, {name});
+c.update(4, f => f.address.city = city);
+c.update(4, {"address.city": city});
+c.update(4, {address: {city: $set: city}});
+*/

@@ -1,4 +1,4 @@
-import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/expression-proxy";
+import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/where-expression-proxy";
 import { BetweenOperatorOptions } from "./standard-operators";
 
 export interface StringOperators<TEntity> {

@@ -1,8 +1,8 @@
-import { ExpressionProxy, ExportableExpressionProxy } from "./expression-proxy";
+import { ExportableExpressionProxy, BooleanExpression } from "./where-expression-proxy";
 import { Introspect } from "../symbols";
 import { createProxy, ProxyType } from "./create-proxy";
 
-export function NOT<TEntity> (expression: ExpressionProxy<TEntity>): ExpressionProxy<TEntity> {
+export function NOT<TEntity> (expression: BooleanExpression<TEntity>): BooleanExpression<TEntity> {
   const expr = (expression as ExportableExpressionProxy)[Introspect].expr;
   if (!expr) throw new Error("Invalid expression");
   const [lvalue, operator, rvalue, ...options] = expr;
@@ -16,5 +16,5 @@ export function NOT<TEntity> (expression: ExpressionProxy<TEntity>): ExpressionP
       rvalue,
       ...options
     ],
-    ProxyType.Expression) as any as ExpressionProxy<TEntity>;
+    ProxyType.Expression) as any as BooleanExpression<TEntity>;
 }

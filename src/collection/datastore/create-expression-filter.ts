@@ -1,4 +1,4 @@
-import { Expression } from "../../core/expression";
+import { ExpressionJson } from "../../core/expression-json";
 import { Options, addOption, combineOptions } from "../../core/options";
 import { getComparer } from "../compare";
 import { getArrayLike } from "../../utils/get-array-like";
@@ -23,7 +23,7 @@ export function getKeyExtractor(keyPath: string) {
   }
 }
 
-export function createExpressionFilter (expression: Expression, opts: Options): FilterFunction {
+export function createExpressionFilter (expression: ExpressionJson, opts: Options): FilterFunction {
   const [lvalue, op, rvalue, opts2] = expression;
   const options = opts && opts2 ?
       combineOptions(opts, opts2) :

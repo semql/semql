@@ -1,8 +1,8 @@
-import { Expression } from "../../core/expression";
+import { ExpressionJson } from "../../core/expression-json";
 import { OrderBySpec } from "../datastore/orderby";
 
 export interface Query {
-  where?: Expression;
+  where?: ExpressionJson;
   limit?: number;
   offset?: number;
   pageToken?: string;
@@ -45,7 +45,7 @@ export type GetResponse = (any | undefined)[];
  */
 export type UpdateRequest = {
   op: "update",
-  where?: Expression;
+  where?: ExpressionJson;
   keys?: any[];
   set?: {[propName: string]: any};
   add?: {[propName: string]: any[]};
@@ -63,6 +63,7 @@ export type InsertResponse = void;
 
 export type UpsertRequest = {
   op: "upsert";
+  where?: ExpressionJson;
   entities: any[];
 }
 
@@ -70,7 +71,7 @@ export type UpsertResponse = void;
 
 export type DeleteRequest = {
   op: "delete";
-  where?: Expression;
+  where?: ExpressionJson;
   keys?: any[];
 };
 

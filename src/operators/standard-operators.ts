@@ -1,4 +1,4 @@
-import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/expression-proxy";
+import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/where-expression-proxy";
 import { ReplaceReturnType } from "../utils/replace-return-type";
 
 export interface StandardOperators<T, TEntity> {

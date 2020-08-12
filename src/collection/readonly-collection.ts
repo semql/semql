@@ -1,10 +1,10 @@
 import { Query, ListQuery } from "./query";
 import { DataStore } from "./datastore";
-import { JsExpression } from "../core/js-expression";
+import { WhereExpression } from "../core/where-expression";
 import { createProxy } from "../core/create-proxy";
 import { Introspect } from "../symbols";
-import { ExportableExpressionProxy } from "../core/expression-proxy";
-import { Expression } from "../core/expression";
+import { ExportableExpressionProxy } from "../core/where-expression-proxy";
+import { ExpressionJson } from "../core/expression-json";
 import { ChainedDataStore } from "./datastore/chained-data-store";
 import { OrderBySpec } from "./datastore/orderby";
 import { PrimitiveType } from "../utils/primitive-type";
@@ -39,7 +39,7 @@ export class ReadonlyCollection<TEntity> {
     }
   }
 
-  where (jsExpression: JsExpression<TEntity>): this {
+  where (jsExpression: WhereExpression<TEntity>): this {
     const proxy = createProxy<TEntity>();
     const expressionProxy = jsExpression(proxy);
     const introspected = (expressionProxy as ExportableExpressionProxy)[Introspect];

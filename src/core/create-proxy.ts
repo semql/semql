@@ -1,5 +1,5 @@
 import { EntityProxy } from "./entity-proxy";
-import { ExpressionProxy } from "./expression-proxy";
+import { BooleanExpression } from "./where-expression-proxy";
 import { Introspect } from "../symbols";
 import { addOption } from "./options";
 

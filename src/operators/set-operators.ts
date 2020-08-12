@@ -1,6 +1,6 @@
-import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/expression-proxy";
+import { ExpressionProxy, ExpressionProxyWithOptions } from "../core/where-expression-proxy";
 import { StringOperatorOptions } from "./string-operators";
-import { JsExpression } from "../core/js-expression";
+import { JsExpression } from "../core/where-expression";
 
 export interface SetOperators<TItem, TEntity> {
   includes(value: TItem): TItem extends string ?
